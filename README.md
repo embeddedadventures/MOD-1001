@@ -1,2 +1,2 @@
 # MOD-1001
-Arduino library and test sketch for the MOD-1001 RTC and temperature sensor.
+Arduino library and test sketch for the <a href="http://www.embeddedadventures.com/rtc_temperature_sensor_module_mod-1001.html">Real Time Clock and Temp Sensor</a> module.
