@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015, Embedded Adventures
+Copyright (c) 2016, Embedded Adventures
 All rights reserved.
 Contact us at source [at] embeddedadventures.com
 www.embeddedadventures.com
@@ -30,17 +30,19 @@ THE POSSIBILITY OF SUCH DAMAGE.
 // TMP275 MOD-1001 RTC and Temperature Sensor Arduino library
 // Written originally by Embedded Adventures
 
-#include "TMP275_MOD-1001.h"
+#include "TMP275.h"
 #include "Wire.h"
 
 static int measurementDelay;	//28ms, 55ms, 110ms, 220ms
 
 void TMP275Class::init() {
+	//Serial.println("init start");
 	measurementDelay = 28;
 	Wire.beginTransmission(TMP275_ADDR);
 	Wire.write(CONF_REG);
 	Wire.write(0x00);
 	Wire.endTransmission();
+	//Serial.println("init end");
 }
 
 uns8 TMP275Class::readConfigRegister() {

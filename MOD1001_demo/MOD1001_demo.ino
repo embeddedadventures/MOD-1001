@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015, Embedded Adventures
+Copyright (c) 2016, Embedded Adventures
 All rights reserved.
 Contact us at source [at] embeddedadventures.com
 www.embeddedadventures.com
@@ -27,44 +27,74 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// TMP275 MOD-1001 RTC and Temperature Sensor Arduino library
+// TMP275 MOD-1001 RTC and Temperature Sensor Arduino test sketch
 // Written originally by Embedded Adventures
 
-#ifndef __TMP275_MOD-1001_h
-#define __TMP275_MOD-1001_h
+#include <TMP275.h>
+#include <M41T81S.h>
+#include <Wire.h>
 
-#include "Arduino.h"
-#include "inttypes.h"
+int sec, mins, hrs, dow, date, month, year, psec;
 
-#define uns8 uint8_t
-#define sn16 int16_t
+void setup() {
+  Serial.begin(115200);
+  Wire.begin();
+  while(!Serial) {};
+  tmp275.init();
+  rtc.init();
+  
+  //Set the time
+  /*rtc.setYear(16);
+  rtc.setMonth(3);
+  rtc.setDate(7);
+  rtc.setDayOfWeek(2);
+  rtc.setHours(13);
+  rtc.setMinutes(11);
+  rtc.setSeconds(10);*/
+  
+  Serial.println("Welcome to the MOD-1001 (TMP275) RTC and Temp Sensor test sketch!");
+  Serial.println("Embedded Adventures (www.embeddedadventures.com)\n");
+  tmp275.setResolution(4);
+  tmp275.enableShutdownMode(true);
+}
 
-#define TMP275_ADDR 0x48
-#define TEMP_REG	0x00
-#define CONF_REG	0x01
-#define TLOW_REG	0x02
-#define THIGH_REG	0x03
+//Loop measures temperature in shutdown mode, so a one-shot reading is performed
+void loop() {
+  updateClock();
+  print_serial();
+  tempOneShot();
+  delay(2000);
+}
+
+void tempOneShot() { 
+  tmp275.enableOS();
+  Serial.print("Temperature, Celsius:\t");
+  Serial.println(tmp275.getTemperature());
+}
 
 
-class TMP275Class {
-private:
-	
-	uns8 readConfigRegister();
-	void writeConfigRegister(uns8 config);
-public:
-	void  init();
-	float getTemperature();
-	void  setResolution(int res);	//1 = 9bit, 2 = 10bit, 3 = 11bit, 4 = 12bit
-	void  enableShutdownMode(bool enable);
-	void  enableOS();
-	void  enableComparatorMode();
-	void  setHighTempThreshold(sn16 threshold);
-	void  setLowTempThreshold(sn16 threshold);
-	float getHighTempThreshold();
-	float getLowTempThreshold();
-	int   getFaults();
-};
+void updateClock() { 
+  psec = rtc.getPartSeconds(); 
+  sec = rtc.getSeconds();
 
-extern TMP275Class tmp275;
+  mins = rtc.getMinutes();
+  hrs = rtc.getHours();
+  dow = rtc.getDayOfWeek();
+  date = rtc.getDate();
+  month = rtc.getMonth();
+  year = rtc.getYear();
+}
 
-#endif
+void print_serial() {
+  Serial.println("hrs:mins:sec:ms - ");
+  Serial.print(hrs);
+  Serial.print(":");
+  Serial.print(mins);
+  Serial.print(":");
+  Serial.print(sec);
+  Serial.print(":");
+  Serial.println(psec);
+  Serial.println();
+}
+
+
